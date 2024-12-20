@@ -557,7 +557,7 @@ void nRF905::startTx(const uint32_t retransmit, const Mode nextMode) {
   }
 
   // Start transmit
-  delay(1);
+  delay(10);
   this->setMode(Transmit);
 }
 
