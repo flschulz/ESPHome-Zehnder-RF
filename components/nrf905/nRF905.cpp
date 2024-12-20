@@ -36,7 +36,7 @@ void nRF905::setup() {
   this->readConfigRegisters();
 
   this->_config.band = true;
-  this->_config.channel = 118;
+  this->_config.channel = 117;
 
   // CRC 16
   this->_config.crc_enable = true;
@@ -557,6 +557,7 @@ void nRF905::startTx(const uint32_t retransmit, const Mode nextMode) {
   }
 
   // Start transmit
+  delay(1);
   this->setMode(Transmit);
 }
 
