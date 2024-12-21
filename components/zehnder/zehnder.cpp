@@ -275,6 +275,9 @@ void ZehnderRF::rfHandleReceived(const uint8_t *const pData, const uint8_t dataL
           this->rf_->writeTxAddress(pResponse->payload.networkJoinOpen.networkId, NULL);
 
           // Send response frame
+          ESP_LOGD(TAG, "Response Frame: %s 0x%02X %s %s %s %s 0x%08X", pTxFrame->rx_type, pTxFrame->rx_id, pTxFrame->tx_type,
+                   pTxFrame->tx_id, pTxFrame->ttl, pTxFrame->command, pTxFrame->payload.networkJoinRequest.networkId);
+          
           this->startTransmit(this->_txFrame, FAN_TX_RETRIES, [this]() {
             ESP_LOGW(TAG, "Query Timeout");
             this->state_ = StateStartDiscovery;
