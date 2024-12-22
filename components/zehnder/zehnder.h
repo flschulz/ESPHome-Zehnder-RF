@@ -14,7 +14,7 @@ namespace zehnder {
 #define FAN_TX_FRAMES 4         // Retransmit every transmitted frame 4 times
 #define FAN_TX_RETRIES 10       // Retry transmission 10 times if no reply is received
 #define FAN_TTL 250             // 0xFA, default time-to-live for a frame
-#define FAN_REPLY_TIMEOUT 500  // Wait 500ms for receiving a reply when doing a network scan
+#define FAN_REPLY_TIMEOUT 1000  // Wait 500ms for receiving a reply when doing a network scan
 
 /* Fan device types */
 enum {
@@ -51,9 +51,9 @@ enum {
   FAN_SPEED_MAX = 0x04
 };  // Max:    100% or 10.0 volt
 
-#define NETWORK_LINK_ID 0xA55A5AA5
+#define NETWORK_LINK_ID 0x1376B580
 #define NETWORK_DEFAULT_ID 0xE7E7E7E7
-#define FAN_JOIN_DEFAULT_TIMEOUT 20000
+#define FAN_JOIN_DEFAULT_TIMEOUT 10000
 
 typedef enum { ResultOk, ResultBusy, ResultFailure } Result;
 
