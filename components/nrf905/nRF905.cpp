@@ -138,6 +138,9 @@ void nRF905::loop() {
 }
 
 void nRF905::setMode(const Mode mode) {
+  if (this->_mode != mode) {
+    ESP_LOGD(TAG, "Switching mode: %d -> %d", this->_mode, mode);
+  }
   // Set power
   switch (mode) {
     case PowerDown:
@@ -368,8 +371,6 @@ void nRF905::writeTxPayload(const uint8_t *const pData, const uint8_t dataLength
 }
 
 void nRF905::readRxPayload(uint8_t *const pData, const uint8_t dataLength, uint8_t *const pStatus) {
-  Buffer buffer;
-
   if (pData == NULL) {
     ESP_LOGE(TAG, "Read RX data pointer invalid");
     return;
@@ -379,8 +380,16 @@ void nRF905::readRxPayload(uint8_t *const pData, const uint8_t dataLength, uint8
     return;
   }
 
+  // Ensure that the device is in Receive mode before attempting to read the payload
+  if (this->_mode != Receive) {
+    ESP_LOGW(TAG, "Device is not in Receive mode, switching to Receive mode");
+    this->setMode(Receive);
+  }
+
+  Buffer buffer;
   buffer.command = NRF905_COMMAND_R_RX_PAYLOAD;
-  (void) memset(buffer.payload, 0, NRF905_MAX_FRAMESIZE);
+
+//  (void) memset(buffer.payload, 0, NRF905_MAX_FRAMESIZE);
 
   this->spiTransfer((uint8_t *) &buffer, sizeof(Buffer));
 
@@ -530,14 +539,25 @@ bool nRF905::airwayBusy(void) {
     busy = this->_gpio_pin_cd->digital_read() == true;
   }
 
+  if (busy) {
+    ESP_LOGW(TAG, "Carrier detect is busy, waiting for channel to clear");
+  }
+
   return busy;
 }
 
 void nRF905::startTx(const uint32_t retransmit, const Mode nextMode) {
   bool update = false;
+  // Ensure device is in Idle mode before starting transmission
   if (this->_mode == PowerDown) {
     this->setMode(Idle);
     delay(3);  // Delay is needed to the radio has time to power-up and see the standby/TX pins pulse
+  }
+
+  // Switch to Transmit mode for transmission
+  if (this->_mode != Transmit) {
+    this->setMode(Transmit);
+    delay(1);
   }
 
   // Update counters
@@ -558,7 +578,10 @@ void nRF905::startTx(const uint32_t retransmit, const Mode nextMode) {
 
   // Start transmit
   delay(1);  // Delay needed to allow radio to process config
-  this->setMode(Transmit);
+  // Ensure that mode is set to Transmit before actually sending
+  if (this->_mode != Transmit) {
+    ESP_LOGE(TAG, "Failed to switch to Transmit mode");
+  }
 }
 
 uint8_t nRF905::readStatus(void) {
