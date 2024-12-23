@@ -389,7 +389,7 @@ void nRF905::readRxPayload(uint8_t *const pData, const uint8_t dataLength, uint8
   Buffer buffer;
   buffer.command = NRF905_COMMAND_R_RX_PAYLOAD;
 
-//  (void) memset(buffer.payload, 0, NRF905_MAX_FRAMESIZE);
+  (void) memset(buffer.payload, 0, NRF905_MAX_FRAMESIZE);
 
   this->spiTransfer((uint8_t *) &buffer, sizeof(Buffer));
 
